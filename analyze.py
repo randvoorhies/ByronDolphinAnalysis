@@ -3,6 +3,7 @@
 import csv
 import numpy
 import matplotlib.pyplot as plt
+import json
 
 def readdb(filename):
   reader = csv.reader(open(filename, 'rb'), delimiter=',', quotechar='"')
@@ -54,8 +55,8 @@ for observationid in DolphinObservations:
     name = Dolphins[dolphinid]["Name"]
     DolphinNameObservations[name][observationid] = entry
     DolphinNameObservations[name][observationid]["Associations"]    = []
-    DolphinNameObservations[name][observationid]["BehaviourEvents"] = set()
-    DolphinNameObservations[name][observationid]["BehaviourStates"] = set()
+    DolphinNameObservations[name][observationid]["BehaviourEvents"] = []
+    DolphinNameObservations[name][observationid]["BehaviourStates"] = []
 
 
 
@@ -83,11 +84,11 @@ for occurenceid in Occurences:
   for dolphinname in DolphinNameObservations:
     if curr_observationid in DolphinNameObservations[dolphinname]:
       try:
-        DolphinNameObservations[dolphinname][curr_observationid]["BehaviourStates"].add(
+        DolphinNameObservations[dolphinname][curr_observationid]["BehaviourStates"].append(
             BehaviourStates_OLD[occurence["BehaviourStatesID"]]["BehaviourDescription"])
       except: pass
       try:
-        DolphinNameObservations[dolphinname][curr_observationid]["BehaviourEvents"].add(
+        DolphinNameObservations[dolphinname][curr_observationid]["BehaviourEvents"].append(
             BehaviourEvents[occurence["BehaviourEventsID"]]["EventDescription"])
       except: pass
 
@@ -118,7 +119,7 @@ for behaviourstateid in BehaviourStates_OLD:
   fig = plt.figure()
   plt.clf()
   ax = fig.add_subplot(111)
-  ax.set_aspect(1)
+  #ax.set_aspect(1)
   res = ax.imshow(matrix, cmap=plt.cm.jet, interpolation='nearest')
   (rows, cols) = matrix.shape
   for r in xrange(rows):
@@ -130,7 +131,8 @@ for behaviourstateid in BehaviourStates_OLD:
   plt.xticks(range(0, len(DolphinNames)), DolphinNames, rotation='vertical')
   plt.yticks(range(0, len(DolphinNames)), DolphinNames)
   plt.title(behaviourdescr)
-  #plt.savefig(behaviourdescr+'.png', format='png')
+  fig.subplots_adjust(left=.1, bottom=.3)
+  plt.savefig(behaviourdescr+'.png', format='png')
  
 
 
@@ -139,6 +141,10 @@ for behaviourstateid in BehaviourStates_OLD:
   BehaviourMatrices[behaviourdescr] = matrix
 
 
-plt.show()
+#plt.show()
 
+# Write the data to a JSON file
+f = open('Data.json', 'w')
+f.write(json.dumps(DolphinNameObservations, sort_keys=True, indent=4))
+f.close()
 
