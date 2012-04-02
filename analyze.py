@@ -103,6 +103,7 @@ for behaviourstateid in BehaviourStates_OLD:
 
     for observationid in DolphinNameObservations[dolphinname]:
       if behaviourdescr in DolphinNameObservations[dolphinname][observationid]["BehaviourStates"]:
+        matrix[dolphinidx, dolphinidx] += 1
         for associateddolphinname in DolphinNameObservations[dolphinname][observationid]["Associations"]:
           assc_dolphinidx = DolphinNames.index(associateddolphinname)
           if(dolphinidx > assc_dolphinidx):
@@ -111,6 +112,8 @@ for behaviourstateid in BehaviourStates_OLD:
             matrix[assc_dolphinidx, dolphinidx] += 1
 
 
+  matrix = matrix + matrix.transpose()
+  matrix[numpy.arange(len(matrix)), numpy.arange(len(matrix))] /=2
 
   fig = plt.figure()
   plt.clf()
@@ -127,6 +130,7 @@ for behaviourstateid in BehaviourStates_OLD:
   plt.xticks(range(0, len(DolphinNames)), DolphinNames, rotation='vertical')
   plt.yticks(range(0, len(DolphinNames)), DolphinNames)
   plt.title(behaviourdescr)
+  #plt.savefig(behaviourdescr+'.png', format='png')
  
 
 
