@@ -1,6 +1,8 @@
 #!/usr/bin/env python
 
 import csv
+import numpy
+import matplotlib.pyplot as plt
 
 def readdb(filename):
   reader = csv.reader(open(filename, 'rb'), delimiter=',', quotechar='"')
@@ -90,6 +92,49 @@ for occurenceid in Occurences:
       except: pass
 
 
+plt.close()
+BehaviourMatrices = {}
+# Build the "confusion matrix" of dolphin interactions for each behavior type
+for behaviourstateid in BehaviourStates_OLD:
+  matrix = numpy.zeros((len(DolphinNames), len(DolphinNames)))
+  behaviourdescr = BehaviourStates_OLD[behaviourstateid]["BehaviourDescription"]
+  for dolphinname in DolphinNameObservations:
+    dolphinidx = DolphinNames.index(dolphinname)
 
+    for observationid in DolphinNameObservations[dolphinname]:
+      if behaviourdescr in DolphinNameObservations[dolphinname][observationid]["BehaviourStates"]:
+        for associateddolphinname in DolphinNameObservations[dolphinname][observationid]["Associations"]:
+          assc_dolphinidx = DolphinNames.index(associateddolphinname)
+          if(dolphinidx > assc_dolphinidx):
+            matrix[dolphinidx, assc_dolphinidx] += 1
+          else:
+            matrix[assc_dolphinidx, dolphinidx] += 1
+
+
+
+  fig = plt.figure()
+  plt.clf()
+  ax = fig.add_subplot(111)
+  ax.set_aspect(1)
+  res = ax.imshow(matrix, cmap=plt.cm.jet, interpolation='nearest')
+  (rows, cols) = matrix.shape
+  for r in xrange(rows):
+    for c in xrange(cols):
+        ax.annotate(str(int(matrix[r,c])), xy=(c, r), 
+                    horizontalalignment='center',
+                    verticalalignment='center')
+
+  plt.xticks(range(0, len(DolphinNames)), DolphinNames, rotation='vertical')
+  plt.yticks(range(0, len(DolphinNames)), DolphinNames)
+  plt.title(behaviourdescr)
+ 
+
+
+
+
+  BehaviourMatrices[behaviourdescr] = matrix
+
+
+plt.show()
 
 
